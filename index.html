@@ -53,14 +53,29 @@ h2.red{color:var(--red)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:0 -16px;padding-left:16px;padding-right:16px}
 .chip{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:99px;white-space:nowrap;font-size:15px}
 .chip.on{background:var(--green);border-color:var(--green);color:#fff}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-@media (min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media (min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
 .pcard{position:relative;border:0;padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;text-align:left;
   box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.pcard .img{position:relative;aspect-ratio:1/1;background:var(--green-soft)}
+.pcard .img{position:relative;aspect-ratio:4/3;background:var(--green-soft)}
 .pcard img{width:100%;height:100%;object-fit:cover;display:block}
-.pcard .nm{padding:8px 10px 10px;font-weight:600;font-size:15px;line-height:1.25}
-.pcard .where{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.pcard .nm{padding:10px 14px 12px;font-weight:700;font-size:19px;line-height:1.25}
+.pcard .where{display:block;font-weight:400;font-size:14px;color:var(--muted)}
+.pcard .ovl span{font-size:14px;padding:6px 10px}
+/* big task cards on the main screen */
+.big{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.big.urgent{border-color:var(--red)}
+.bimg{display:block;position:relative;width:100%;aspect-ratio:4/3;border:0;padding:0;background:var(--green-soft)}
+.bimg img{width:100%;height:100%;object-fit:cover;display:block}
+.bimg .nophoto{height:100%}
+.bimg .lbl{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 10px;text-align:left;color:#fff;font-weight:700;font-size:20px;
+  background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.btask{display:flex;gap:10px;align-items:center;padding:12px 12px 12px 14px;border-top:1px solid var(--line)}
+.btask.urgent{background:var(--red-soft)}
+.btask .txt{flex:1;min-width:0}
+.btask .tt{font-weight:600;font-size:17px}
+.btask .dt{font-size:14px;color:var(--muted)}
+.btask .dt.late{color:var(--red);font-weight:600}
 .ovl{position:absolute;left:6px;right:6px;bottom:6px;display:flex;flex-direction:column;gap:4px}
 .ovl span{background:rgba(255,255,255,.93);color:#1f2a24;font-size:12px;font-weight:600;padding:4px 8px;border-radius:8px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -215,13 +230,30 @@ function taskRow(t, showPlant) {
     <button class="done-btn" data-done="${t.id}" aria-label="Зроблено">✓</button>
   </div>`;
 }
+// Велика картка: фото рослини на всю ширину, під ним — її задачі.
+function bigCards(list) {
+  const groups = [];
+  list.forEach(t => { let g = groups.find(x => x.p === t.plant); if (!g) groups.push(g = { p: t.plant, ts: [] }); g.ts.push(t); });
+  return groups.map(g => {
+    const p = byId[g.p]; if (!p) return "";
+    const urg = g.ts.some(t => t.urgent);
+    return `<div class="big ${urg ? "urgent" : ""}">
+      <button class="bimg" data-open="${p.id}">${imgTag(p)}<div class="lbl">${esc(p.name)}</div></button>
+      ${g.ts.map(t => { const d = diff(t.due, today()); return `<div class="btask ${t.urgent ? "urgent" : ""}">
+        <div class="txt"><div class="tt">${t.urgent ? "❗ " : ""}${esc(t.title)}</div>
+        <div class="dt ${d < 0 ? "late" : ""}">${human(t.due)}${t.every ? " · кожні " + t.every + " дн." : ""}</div></div>
+        <button class="more-btn" data-more="${t.id}" aria-label="Інші дії">⋯</button>
+        <button class="done-btn" data-done="${t.id}" aria-label="Зроблено">✓</button></div>`; }).join("")}
+    </div>`;
+  }).join("");
+}
 function renderToday() {
   const t0 = today();
   const all = [...S.tasks].sort((a, b) => a.due.localeCompare(b.due) || (b.urgent - a.urgent));
   const late = all.filter(t => t.due < t0), now = all.filter(t => t.due === t0),
     week = all.filter(t => diff(t.due, t0) > 0 && diff(t.due, t0) <= 7), later = all.filter(t => diff(t.due, t0) > 7);
   const sec = (title, list, cls, emptyTxt) => list.length || emptyTxt ? `<h2 class="${cls || ""}">${title}</h2>` +
-    (list.length ? list.map(t => taskRow(t, true)).join("") : `<div class="empty">${emptyTxt}</div>`) : "";
+    (list.length ? bigCards(list) : `<div class="empty">${emptyTxt}</div>`) : "";
   return sec("Прострочено", late, "red") + sec("Сьогодні", now, "", "На сьогодні все зроблено 🌿") +
     sec("Цього тижня", week, "", "") + sec("Пізніше", later, "", "") +
     `<p class="small" style="margin-top:20px">Задачу можна додати на сторінці будь-якої рослини.</p>`;
