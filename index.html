@@ -47,7 +47,7 @@ h2.red{color:var(--red)}
 .task .tt{font-weight:600}
 .task .dt{font-size:13px;color:var(--muted)}
 .task .dt.late{color:var(--red);font-weight:600}
-.done-btn{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--green);background:none;color:var(--green);font-size:20px}
+.done-btn{flex:none;height:44px;padding:0 14px;border-radius:22px;border:2px solid var(--green);background:none;color:var(--green);font-size:16px;font-weight:700;white-space:nowrap}
 .done-btn:active{background:var(--green);color:#fff}
 .more-btn{flex:none;width:32px;height:44px;border:0;background:none;color:var(--muted);font-size:20px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:0 -16px;padding-left:16px;padding-right:16px}
@@ -133,7 +133,7 @@ input[type=text],input[type=date],select{width:100%;padding:11px 12px;border:1px
 <script>
 "use strict";
 const KEY = "kvity-v1";
-const VERSION = "12.10.2026 · 5";
+const VERSION = "12.10.2026 · 6";
 const PLACES = { home: "Вдома", terrace: "Тераса", garden: "Сад" };
 const TYPES = {
   water: "💧 Полити", check: "👆 Перевірити землю", feed: "🧪 Підживити", mist: "💦 Обприскати",
@@ -151,6 +151,14 @@ function load() {
   if (!s.seeded) {
     SEED_TASKS.forEach(t => s.tasks.push({ id: uid(), plant: t.plant, title: t.title, type: t.type, due: t.due, every: t.every || 0, urgent: !!t.urgent }));
     s.seeded = true;
+  }
+  // Версія 2: графік поливу/догляду для кожної рослини. Додаємо лише те, чого ще немає.
+  if (!s.seedV || s.seedV < 2) {
+    SEED_TASKS_2.forEach(t => {
+      if (!s.tasks.some(x => x.plant === t.plant && x.title === t.title))
+        s.tasks.push({ id: uid(), plant: t.plant, title: t.title, type: t.type, due: t.due, every: t.every || 0, urgent: false });
+    });
+    s.seedV = 2;
   }
   return s;
 }
@@ -230,7 +238,7 @@ function taskRow(t, showPlant) {
       <div class="dt ${d < 0 ? "late" : ""}">${human(t.due)}${t.every ? " · кожні " + t.every + " дн." : ""}</div>
     </div>
     <button class="more-btn" data-more="${t.id}" aria-label="Інші дії">⋯</button>
-    <button class="done-btn" data-done="${t.id}" aria-label="Зроблено">✓</button>
+    <button class="done-btn" data-done="${t.id}" aria-label="Виконала">✓ Готово</button>
   </div>`;
 }
 // Велика картка: фото рослини на всю ширину, під ним — її задачі.
@@ -246,7 +254,7 @@ function bigCards(list) {
         <div class="txt"><div class="tt">${t.urgent ? "❗ " : ""}${esc(t.title)}</div>
         <div class="dt ${d < 0 ? "late" : ""}">${human(t.due)}${t.every ? " · кожні " + t.every + " дн." : ""}</div></div>
         <button class="more-btn" data-more="${t.id}" aria-label="Інші дії">⋯</button>
-        <button class="done-btn" data-done="${t.id}" aria-label="Зроблено">✓</button></div>`; }).join("")}
+        <button class="done-btn" data-done="${t.id}" aria-label="Виконала">✓ Готово</button></div>`; }).join("")}
     </div>`;
   }).join("");
 }
@@ -343,17 +351,19 @@ function moreMenu(id) {
   const p = byId[t.plant];
   const bg = document.createElement("div"); bg.className = "sheet-bg";
   bg.innerHTML = `<div class="sheet"><h3>${esc(t.title)}</h3><div class="sub">${esc(p.name)} · ${human(t.due)}</div>
+    <button class="opt" data-a="done" style="color:var(--green);font-weight:700">✓ Виконала${t.every ? " (наступна — через " + t.every + " дн.)" : ""}</button>
     <button class="opt" data-a="1">Перенести на завтра</button>
     <button class="opt" data-a="3">Перенести на 3 дні</button>
     <button class="opt" data-a="7">Перенести на тиждень</button>
     <button class="opt" data-a="cal">📅 Додати в календар iPhone (з нагадуванням)</button>
-    <button class="opt red" data-a="del">Видалити задачу</button>
+    <button class="opt red" data-a="del">Видалити задачу (більше не потрібна)</button>
     <button class="opt" data-a="x">Скасувати</button></div>`;
   document.body.appendChild(bg);
   bg.onclick = e => {
     const a = e.target.dataset.a; if (e.target === bg || a === "x") return bg.remove();
     if (!a) return;
     if (a === "cal") { calendar(t, p); return bg.remove(); }
+    if (a === "done") { bg.remove(); return markDone(id); }
     if (a === "del") { if (confirm("Видалити задачу «" + t.title + "»?")) { S.tasks = S.tasks.filter(x => x.id !== id); toast("Видалено"); } }
     else { t.due = addDays(t.due < today() ? today() : t.due, +a); toast("Перенесено: " + human(t.due)); }
     save(); bg.remove(); render();

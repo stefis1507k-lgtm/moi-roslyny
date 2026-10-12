@@ -438,3 +438,29 @@ const SEED_TASKS = [
   { plant: "asplenium", title: "Підвищити вологість повітря (опалення)", type: "other", due: "2026-10-15" },
   { plant: "spathi-domino", title: "Зрізати відцвілі квітконоси", type: "prune", due: "2026-10-15" }
 ];
+
+// Графік для кожної рослини (додано 2026-10-12, версія 2).
+// Перший раз — сьогодні; після «Готово» наступна дата рахується сама.
+const SEED_TASKS_2 = [
+  { plant: "spathi-green", title: "Перевірити землю, полити якщо верх сухий", type: "water", due: "2026-10-12", every: 5 },
+  { plant: "spathi-domino", title: "Перевірити землю, полити якщо верх сухий", type: "water", due: "2026-10-12", every: 5 },
+  { plant: "zz-1", title: "Перевірити: полити, тільки якщо земля повністю суха", type: "check", due: "2026-10-12", every: 14 },
+  { plant: "asplenium", title: "Перевірити землю — має бути злегка волога", type: "water", due: "2026-10-12", every: 4 },
+  { plant: "peperomia-red", title: "Перевірити землю, полити якщо просохла наполовину", type: "water", due: "2026-10-12", every: 10 },
+  { plant: "rhipsalis", title: "Перевірити землю, полити якщо верх сухий", type: "water", due: "2026-10-12", every: 7 },
+  { plant: "dracaena-kids", title: "Перевірити землю, полити якщо просохла на третину", type: "water", due: "2026-10-12", every: 10 },
+  { plant: "philo-a", title: "Перевірити землю, полити якщо верх сухий", type: "water", due: "2026-10-12", every: 7 },
+  { plant: "peperomia-big", title: "Перевірити землю, полити якщо просохла наполовину", type: "water", due: "2026-10-12", every: 10 },
+  { plant: "philo-b", title: "Перевірити землю, полити якщо верх сухий", type: "water", due: "2026-10-12", every: 7 },
+  { plant: "orchid", title: "Подивитися на коріння: сріблясте — полити зануренням", type: "water", due: "2026-10-12", every: 7 },
+  { plant: "mandarin", title: "Перевірити землю, полити якщо верх сухий; обприскати листя", type: "water", due: "2026-10-13", every: 4 },
+  { plant: "mandevilla", title: "Перевірити землю, полити помірно", type: "water", due: "2026-10-15", every: 10 },
+  { plant: "begonia", title: "Перевірити землю, полити під корінь", type: "water", due: "2026-10-14", every: 5 },
+  { plant: "cabbage", title: "Перевірити землю в горщиках, полити якщо сухо", type: "water", due: "2026-10-13", every: 7 },
+  { plant: "heather", title: "Перевірити землю — верес не можна пересушувати", type: "water", due: "2026-10-12", every: 3 },
+  { plant: "hydrangea", title: "Замульчувати основу кущів (кора/компост)", type: "other", due: "2026-10-18" },
+  { plant: "pennisetum", title: "За бажанням зв'язати кущі шпагатом на зиму (не зрізати!)", type: "other", due: "2026-11-08" },
+  { plant: "pennisetum", title: "Зрізати торішню траву на 10–15 см", type: "prune", due: "2027-03-25" },
+  { plant: "miscanthus", title: "Зрізати торішню траву на 10–15 см", type: "prune", due: "2027-03-25" },
+  { plant: "hydrangea", title: "Обрізати пагони на 2–3 пари бруньок", type: "prune", due: "2027-03-20" }
+];
