@@ -29,11 +29,11 @@ header{padding:calc(env(safe-area-inset-top) + 14px) 16px 8px}
 header h1{margin:0;font-size:26px;letter-spacing:-.3px}
 .season{margin-top:6px;display:inline-flex;gap:6px;align-items:center;background:var(--green-soft);color:var(--green);
   padding:4px 10px;border-radius:99px;font-size:14px;font-weight:600}
-main{padding:0 16px calc(90px + env(safe-area-inset-bottom))}
+main{padding:0 16px calc(110px + env(safe-area-inset-bottom))}
 nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);
   padding-bottom:env(safe-area-inset-bottom);z-index:10}
-nav button{flex:1;border:0;background:none;padding:10px 0 12px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button .ico{font-size:22px;line-height:1}
+nav button{flex:1;border:0;background:none;padding:10px 0 12px;font-size:16px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .ico{font-size:32px;line-height:1.1}
 nav button.on{color:var(--green);font-weight:700}
 h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:22px 0 8px}
 h2.red{color:var(--red)}
@@ -69,6 +69,9 @@ h2.red{color:var(--red)}
 .bimg .nophoto{height:100%}
 .bimg .lbl{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 10px;text-align:left;color:#fff;font-weight:700;font-size:20px;
   background:linear-gradient(transparent,rgba(0,0,0,.6))}
+.bimg .lsub{display:block;font-weight:500;font-size:14px;opacity:.9}
+.ovl.top{top:8px;bottom:auto;left:8px;right:8px;align-items:flex-start}
+.ovl.top span{font-size:14px;padding:6px 10px;max-width:100%}
 .btask{display:flex;gap:10px;align-items:center;padding:12px 12px 12px 14px;border-top:1px solid var(--line)}
 .btask.urgent{background:var(--red-soft)}
 .btask .txt{flex:1;min-width:0}
@@ -111,14 +114,14 @@ input[type=text],input[type=date],select{width:100%;padding:11px 12px;border:1px
 .sheet .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
 .sheet button.opt{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;padding:14px 4px;font-size:16px}
 .sheet button.opt.red{color:var(--red)}
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f2a24;color:#fff;
+.toast{position:fixed;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f2a24;color:#fff;
   padding:10px 16px;border-radius:12px;font-size:14px;z-index:30;max-width:90%}
 .small{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header>
-  <h1 id="htitle">Мої рослини</h1>
+  <h1 id="htitle">Що зробити</h1>
   <div class="season" id="season"></div>
 </header>
 <main id="app"></main>
@@ -130,7 +133,7 @@ input[type=text],input[type=date],select{width:100%;padding:11px 12px;border:1px
 <script>
 "use strict";
 const KEY = "kvity-v1";
-const VERSION = "12.10.2026 · 4";
+const VERSION = "12.10.2026 · 5";
 const PLACES = { home: "Вдома", terrace: "Тераса", garden: "Сад" };
 const TYPES = {
   water: "💧 Полити", check: "👆 Перевірити землю", feed: "🧪 Підживити", mist: "💦 Обприскати",
@@ -210,7 +213,7 @@ function render() {
   if (view.name === "today") app.innerHTML = renderToday();
   else if (view.name === "plants") app.innerHTML = renderPlants();
   else app.innerHTML = renderPlant(byId[view.id]);
-  document.getElementById("htitle").textContent = view.name === "plant" ? "" : view.name === "today" ? "Що зробити" : "Мої рослини";
+  document.getElementById("htitle").textContent = view.name === "plant" ? "" : view.name === "today" ? "Що зробити" : "Рослини";
   document.querySelector("header").style.display = view.name === "plant" ? "none" : "";
   bind();
 }
@@ -264,11 +267,11 @@ function renderPlants() {
   const list = PLANTS.filter(p => filter === "all" || p.place === filter);
   const chips = [["all", "Усі"], ["home", "Вдома"], ["terrace", "Тераса"], ["garden", "Сад"]]
     .map(([k, v]) => `<button class="chip ${filter === k ? "on" : ""}" data-filter="${k}">${v}</button>`).join("");
-  return `<div class="chips">${chips}</div><div class="grid">` + list.map(p => `
-    <button class="pcard" data-open="${p.id}">
-      <div class="img">${imgTag(p)}${overlay(p.id, 2)}</div>
-      <div class="nm">${esc(p.name)}<span class="where">${PLACES[p.place]}</span></div>
-    </button>`).join("") + `</div>
+  return `<div class="chips">${chips}</div>` + list.map(p => `
+    <div class="big">
+      <button class="bimg" data-open="${p.id}">${imgTag(p)}${overlay(p.id, 2).replace('class="ovl"', 'class="ovl top"')}
+        <div class="lbl">${esc(p.name)}<span class="lsub">${PLACES[p.place]}</span></div></button>
+    </div>`).join("") + `
     <h2>Резервна копія</h2>
     <div class="box"><div class="small">Дані зберігаються тільки на цьому телефоні. Раз на місяць зберігай копію — тоді нічого не втратиш при зміні телефона.</div>
       <div class="row" style="margin-top:10px"><button class="btn small" id="exp">Зберегти копію</button>
