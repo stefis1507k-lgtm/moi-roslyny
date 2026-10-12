@@ -133,7 +133,7 @@ input[type=text],input[type=date],select{width:100%;padding:11px 12px;border:1px
 <script>
 "use strict";
 const KEY = "kvity-v1";
-const VERSION = "12.10.2026 · 6";
+const VERSION = "12.10.2026 · 7";
 const PLACES = { home: "Вдома", terrace: "Тераса", garden: "Сад" };
 const TYPES = {
   water: "💧 Полити", check: "👆 Перевірити землю", feed: "🧪 Підживити", mist: "💦 Обприскати",
@@ -159,6 +159,14 @@ function load() {
         s.tasks.push({ id: uid(), plant: t.plant, title: t.title, type: t.type, due: t.due, every: t.every || 0, urgent: false });
     });
     s.seedV = 2;
+  }
+  // Версія 3: повторювані задачі для садових рослин.
+  if (s.seedV < 3) {
+    SEED_TASKS_3.forEach(t => {
+      if (!s.tasks.some(x => x.plant === t.plant && x.title === t.title))
+        s.tasks.push({ id: uid(), plant: t.plant, title: t.title, type: t.type, due: t.due, every: t.every || 0, urgent: false });
+    });
+    s.seedV = 3;
   }
   return s;
 }

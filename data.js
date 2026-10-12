@@ -464,3 +464,14 @@ const SEED_TASKS_2 = [
   { plant: "miscanthus", title: "Зрізати торішню траву на 10–15 см", type: "prune", due: "2027-03-25" },
   { plant: "hydrangea", title: "Обрізати пагони на 2–3 пари бруньок", type: "prune", due: "2027-03-20" }
 ];
+
+// Версія 3: повторювані задачі для рослин, у яких були лише разові — щоб жодна не зникала з графіка.
+const SEED_TASKS_3 = [
+  { plant: "zz-2", title: "Перевірити: полити, тільки якщо земля повністю суха", type: "check", due: "2026-10-26", every: 14 },
+  { plant: "thuja", title: "Огляд туй: у посуху полити, після снігопаду струсити сніг", type: "check", due: "2026-11-03", every: 14 },
+  { plant: "dahlia", title: "Перевірити бульби в сховищі: гнилі прибрати", type: "check", due: "2026-11-25", every: 30 },
+  { plant: "hosta", title: "Огляд: листя прибране, мульча на місці", type: "check", due: "2026-12-01", every: 30 },
+  { plant: "hydrangea", title: "Огляд: струсити важкий сніг з гілок, суцвіття не зрізати", type: "check", due: "2026-11-15", every: 30 },
+  { plant: "pennisetum", title: "Огляд: кущі цілі, не зламані снігом чи вітром", type: "check", due: "2026-11-15", every: 30 },
+  { plant: "miscanthus", title: "Огляд: кущі цілі, не зламані снігом чи вітром", type: "check", due: "2026-11-15", every: 30 }
+];
