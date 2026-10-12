@@ -53,15 +53,14 @@ h2.red{color:var(--red)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:0 -16px;padding-left:16px;padding-right:16px}
 .chip{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:99px;white-space:nowrap;font-size:15px}
 .chip.on{background:var(--green);border-color:var(--green);color:#fff}
-.grid{display:grid;grid-template-columns:1fr;gap:16px}
-@media (min-width:700px){.grid{grid-template-columns:repeat(2,1fr)}}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
 .pcard{position:relative;border:0;padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;text-align:left;
   box-shadow:0 1px 2px rgba(0,0,0,.06)}
-.pcard .img{position:relative;aspect-ratio:4/3;background:var(--green-soft)}
+.pcard .img{position:relative;aspect-ratio:1/1;background:var(--green-soft)}
 .pcard img{width:100%;height:100%;object-fit:cover;display:block}
-.pcard .nm{padding:10px 14px 12px;font-weight:700;font-size:19px;line-height:1.25}
-.pcard .where{display:block;font-weight:400;font-size:14px;color:var(--muted)}
-.pcard .ovl span{font-size:14px;padding:6px 10px}
+.pcard .nm{padding:8px 10px 10px;font-weight:600;font-size:15px;line-height:1.25}
+.pcard .where{display:block;font-weight:400;font-size:12px;color:var(--muted)}
 /* big task cards on the main screen */
 .big{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
 .big.urgent{border-color:var(--red)}
