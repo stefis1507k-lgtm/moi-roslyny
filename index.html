@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Мої рослини</title>
+<meta name="theme-color" content="#2f5d46">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Рослини">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#f6f4ee; --card:#fff; --ink:#1f2a24; --muted:#6b756f; --line:#e4e1d8;
+  --green:#2f5d46; --green-soft:#e3eee7; --red:#c2412d; --red-soft:#fbe7e3;
+  --amber:#a8670c; --amber-soft:#fbf0dc; --radius:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#141816; --card:#1e2420; --ink:#eef2ef; --muted:#a3ada7; --line:#2e3631;
+    --green:#7fc29b; --green-soft:#24342b; --red:#ff8a73; --red-soft:#3a2420; --amber:#f2b55e; --amber-soft:#3a2f1c; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+header{padding:calc(env(safe-area-inset-top) + 14px) 16px 8px}
+header h1{margin:0;font-size:26px;letter-spacing:-.3px}
+.season{margin-top:6px;display:inline-flex;gap:6px;align-items:center;background:var(--green-soft);color:var(--green);
+  padding:4px 10px;border-radius:99px;font-size:14px;font-weight:600}
+main{padding:0 16px calc(90px + env(safe-area-inset-bottom))}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom);z-index:10}
+nav button{flex:1;border:0;background:none;padding:10px 0 12px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px}
+nav button .ico{font-size:22px;line-height:1}
+nav button.on{color:var(--green);font-weight:700}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:22px 0 8px}
+h2.red{color:var(--red)}
+.empty{color:var(--muted);padding:14px;background:var(--card);border-radius:var(--radius);text-align:center}
+.task{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:var(--radius);padding:10px;margin-bottom:8px;
+  border:1px solid var(--line)}
+.task.urgent{border-color:var(--red);background:var(--red-soft)}
+.task .ph{width:60px;height:60px;border-radius:12px;object-fit:cover;flex:none;background:var(--green-soft)}
+.task .txt{flex:1;min-width:0}
+.task .pl{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.task .tt{font-weight:600}
+.task .dt{font-size:13px;color:var(--muted)}
+.task .dt.late{color:var(--red);font-weight:600}
+.done-btn{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--green);background:none;color:var(--green);font-size:20px}
+.done-btn:active{background:var(--green);color:#fff}
+.more-btn{flex:none;width:32px;height:44px;border:0;background:none;color:var(--muted);font-size:20px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.chip{border:1px solid var(--line);background:var(--card);padding:7px 14px;border-radius:99px;white-space:nowrap;font-size:15px}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media (min-width:640px){.grid{grid-template-columns:repeat(3,1fr)}}
+.pcard{position:relative;border:0;padding:0;background:var(--card);border-radius:var(--radius);overflow:hidden;text-align:left;
+  box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.pcard .img{position:relative;aspect-ratio:1/1;background:var(--green-soft)}
+.pcard img{width:100%;height:100%;object-fit:cover;display:block}
+.pcard .nm{padding:8px 10px 10px;font-weight:600;font-size:15px;line-height:1.25}
+.pcard .where{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.ovl{position:absolute;left:6px;right:6px;bottom:6px;display:flex;flex-direction:column;gap:4px}
+.ovl span{background:rgba(255,255,255,.93);color:#1f2a24;font-size:12px;font-weight:600;padding:4px 8px;border-radius:8px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ovl span.u{background:#c2412d;color:#fff}
+.nophoto{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:48px}
+/* plant page */
+.back{border:0;background:none;color:var(--green);font-weight:600;padding:8px 0;font-size:16px}
+.hero{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--green-soft);aspect-ratio:4/5;max-height:62vh;width:100%}
+.hero img{width:100%;height:100%;object-fit:cover;display:block}
+.hero .ovl{left:10px;right:10px;bottom:10px;gap:6px}
+.hero .ovl span{font-size:14px;padding:6px 10px;white-space:normal}
+.title{margin:12px 0 0;font-size:24px;line-height:1.2}
+.latin{color:var(--muted);font-style:italic;margin-top:2px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:12px}
+.box.now{background:var(--green-soft);border-color:transparent}
+.box.note{background:var(--amber-soft);border-color:transparent}
+.box h3{margin:0 0 6px;font-size:16px}
+.care dt{font-weight:700;margin-top:10px}
+.care dt:first-child{margin-top:0}
+.care dd{margin:2px 0 0}
+.stabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:12px 16px;background:var(--green);color:#fff;font-weight:600}
+.btn.ghost{background:var(--card);color:var(--green);border:1px solid var(--green)}
+.btn.small{padding:8px 12px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+label.f{display:block;font-size:14px;color:var(--muted);margin:10px 0 4px}
+input[type=text],input[type=date],select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card);font-size:16px}
+.sugg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.sugg button{text-align:left;border:1px dashed var(--green);background:none;color:var(--green);border-radius:12px;padding:10px 12px}
+.hist{font-size:14px;color:var(--muted);margin:0;padding-left:18px}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:20;display:flex;align-items:flex-end}
+.sheet{background:var(--card);width:100%;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet h3{margin:0 0 4px}
+.sheet .sub{color:var(--muted);font-size:14px;margin-bottom:12px}
+.sheet button.opt{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--line);background:none;padding:14px 4px;font-size:16px}
+.sheet button.opt.red{color:var(--red)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1f2a24;color:#fff;
+  padding:10px 16px;border-radius:12px;font-size:14px;z-index:30;max-width:90%}
+.small{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="htitle">Мої рослини</h1>
+  <div class="season" id="season"></div>
+</header>
+<main id="app"></main>
+<nav>
+  <button id="nav-today" class="on"><span class="ico">🗓️</span>Сьогодні</button>
+  <button id="nav-plants"><span class="ico">🪴</span>Рослини</button>
+</nav>
+<script src="data.js"></script>
+<script>
+"use strict";
+const KEY = "kvity-v1";
+const PLACES = { home: "Вдома", terrace: "Тераса", garden: "Сад" };
+const TYPES = {
+  water: "💧 Полити", check: "👆 Перевірити землю", feed: "🧪 Підживити", mist: "💦 Обприскати",
+  prune: "✂️ Обрізати", repot: "🪴 Пересадити", move: "🚪 Занести / винести", other: "📝 Інше"
+};
+const SEASONS = { autumn: "🍂 Осінь", winter: "❄️ Зима", spring: "🌱 Весна", summer: "☀️ Літо" };
+const byId = Object.fromEntries(PLANTS.map(p => [p.id, p]));
+
+// ---------- state ----------
+let S = load();
+function load() {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(KEY)); } catch (e) {}
+  if (!s) s = { tasks: [], history: [], photos: {}, seeded: false };
+  if (!s.seeded) {
+    SEED_TASKS.forEach(t => s.tasks.push({ id: uid(), plant: t.plant, title: t.title, type: t.type, due: t.due, every: t.every || 0, urgent: !!t.urgent }));
+    s.seeded = true;
+  }
+  return s;
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch (e) { toast("Не вдалося зберегти — замало місця на телефоні"); }
+}
+save();
+function uid() { return Math.random().toString(36).slice(2, 10) + Date.now().toString(36); }
+
+// ---------- dates ----------
+function iso(d) { const z = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + z(d.getMonth() + 1) + "-" + z(d.getDate()); }
+function today() { return iso(new Date()); }
+function addDays(s, n) { const d = new Date(s + "T12:00:00"); d.setDate(d.getDate() + n); return iso(d); }
+function diff(a, b) { return Math.round((new Date(a + "T12:00:00") - new Date(b + "T12:00:00")) / 864e5); }
+const MONTHS = ["січ", "лют", "бер", "квіт", "трав", "черв", "лип", "серп", "вер", "жовт", "лист", "груд"];
+function human(s) {
+  const d = diff(s, today());
+  if (d === 0) return "сьогодні";
+  if (d === 1) return "завтра";
+  if (d === -1) return "вчора";
+  if (d < 0) return "прострочено на " + (-d) + " дн.";
+  const dt = new Date(s + "T12:00:00");
+  return dt.getDate() + " " + MONTHS[dt.getMonth()] + (d < 7 ? " (через " + d + " дн.)" : "");
+}
+function seasonNow() { const m = new Date().getMonth() + 1; return m >= 3 && m <= 5 ? "spring" : m <= 8 && m >= 6 ? "summer" : m >= 9 && m <= 11 ? "autumn" : "winter"; }
+
+// ---------- helpers ----------
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function photoOf(p) { return S.photos[p.id] || p.photo || ""; }
+function imgTag(p, cls) {
+  const src = photoOf(p);
+  return src ? `<img class="${cls || ""}" src="${esc(src)}" alt="${esc(p.name)}" loading="lazy">` : `<div class="nophoto ${cls || ""}">🌿</div>`;
+}
+function tasksOf(pid) { return S.tasks.filter(t => t.plant === pid).sort((a, b) => a.due.localeCompare(b.due)); }
+function toast(msg) {
+  document.querySelectorAll(".toast").forEach(x => x.remove());
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function overlay(pid, max) {
+  const ts = tasksOf(pid).slice(0, max);
+  if (!ts.length) return "";
+  const when = t => { const d = diff(t.due, today()); return d <= 0 ? "" : " · " + (d === 1 ? "завтра" : new Date(t.due + "T12:00:00").getDate() + " " + MONTHS[new Date(t.due + "T12:00:00").getMonth()]); };
+  return `<div class="ovl">${ts.map(t => `<span class="${t.urgent || diff(t.due, today()) < 0 ? "u" : ""}">${t.urgent ? "❗ " : ""}${esc(t.title)}${when(t)}</span>`).join("")}</div>`;
+}
+
+// ---------- routing ----------
+let view = { name: "today" }, filter = "all";
+function go(v) { view = v; render(); window.scrollTo(0, 0); }
+document.getElementById("nav-today").onclick = () => go({ name: "today" });
+document.getElementById("nav-plants").onclick = () => go({ name: "plants" });
+window.addEventListener("popstate", () => { if (view.name === "plant") go({ name: view.from || "plants" }); });
+
+function render() {
+  document.getElementById("season").textContent = "Зараз: " + SEASONS[seasonNow()];
+  document.getElementById("nav-today").classList.toggle("on", view.name === "today");
+  document.getElementById("nav-plants").classList.toggle("on", view.name !== "today");
+  const app = document.getElementById("app");
+  if (view.name === "today") app.innerHTML = renderToday();
+  else if (view.name === "plants") app.innerHTML = renderPlants();
+  else app.innerHTML = renderPlant(byId[view.id]);
+  document.getElementById("htitle").textContent = view.name === "plant" ? "" : view.name === "today" ? "Що зробити" : "Мої рослини";
+  document.querySelector("header").style.display = view.name === "plant" ? "none" : "";
+  bind();
+}
+
+// ---------- today ----------
+function taskRow(t, showPlant) {
+  const p = byId[t.plant]; if (!p) return "";
+  const d = diff(t.due, today());
+  return `<div class="task ${t.urgent ? "urgent" : ""}">
+    <button class="more-btn" style="width:auto;padding:0" data-open="${p.id}" aria-label="Відкрити рослину">${imgTag(p, "ph")}</button>
+    <div class="txt" data-open="${p.id}">
+      ${showPlant ? `<div class="pl">${esc(p.name)}</div>` : ""}
+      <div class="tt">${t.urgent ? "❗ " : ""}${esc(t.title)}</div>
+      <div class="dt ${d < 0 ? "late" : ""}">${human(t.due)}${t.every ? " · кожні " + t.every + " дн." : ""}</div>
+    </div>
+    <button class="more-btn" data-more="${t.id}" aria-label="Інші дії">⋯</button>
+    <button class="done-btn" data-done="${t.id}" aria-label="Зроблено">✓</button>
+  </div>`;
+}
+function renderToday() {
+  const t0 = today();
+  const all = [...S.tasks].sort((a, b) => a.due.localeCompare(b.due) || (b.urgent - a.urgent));
+  const late = all.filter(t => t.due < t0), now = all.filter(t => t.due === t0),
+    week = all.filter(t => diff(t.due, t0) > 0 && diff(t.due, t0) <= 7), later = all.filter(t => diff(t.due, t0) > 7);
+  const sec = (title, list, cls, emptyTxt) => list.length || emptyTxt ? `<h2 class="${cls || ""}">${title}</h2>` +
+    (list.length ? list.map(t => taskRow(t, true)).join("") : `<div class="empty">${emptyTxt}</div>`) : "";
+  return sec("Прострочено", late, "red") + sec("Сьогодні", now, "", "На сьогодні все зроблено 🌿") +
+    sec("Цього тижня", week, "", "") + sec("Пізніше", later, "", "") +
+    `<p class="small" style="margin-top:20px">Задачу можна додати на сторінці будь-якої рослини.</p>`;
+}
+
+// ---------- plants ----------
+function renderPlants() {
+  const list = PLANTS.filter(p => filter === "all" || p.place === filter);
+  const chips = [["all", "Усі"], ["home", "Вдома"], ["terrace", "Тераса"], ["garden", "Сад"]]
+    .map(([k, v]) => `<button class="chip ${filter === k ? "on" : ""}" data-filter="${k}">${v}</button>`).join("");
+  return `<div class="chips">${chips}</div><div class="grid">` + list.map(p => `
+    <button class="pcard" data-open="${p.id}">
+      <div class="img">${imgTag(p)}${overlay(p.id, 2)}</div>
+      <div class="nm">${esc(p.name)}<span class="where">${PLACES[p.place]}</span></div>
+    </button>`).join("") + `</div>
+    <h2>Резервна копія</h2>
+    <div class="box"><div class="small">Дані зберігаються тільки на цьому телефоні. Раз на місяць зберігай копію — тоді нічого не втратиш при зміні телефона.</div>
+      <div class="row" style="margin-top:10px"><button class="btn small" id="exp">Зберегти копію</button>
+      <label class="btn small ghost">Відновити з копії<input type="file" id="imp" accept="application/json,.json" hidden></label></div></div>`;
+}
+
+// ---------- plant page ----------
+let seasonTab = null;
+function renderPlant(p) {
+  const s = seasonNow(), tab = seasonTab || s;
+  const ts = tasksOf(p.id);
+  const hist = S.history.filter(h => h.plant === p.id).slice(-8).reverse();
+  const opts = Object.entries(TYPES).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+  const sug = (p.suggest || []).map((x, i) => `<button data-sugg="${i}">＋ ${esc(x.title)}${x.every ? " · кожні " + x.every + " дн." : ""}</button>`).join("");
+  return `<button class="back" data-back>‹ Назад</button>
+  <div class="hero">${imgTag(p)}${overlay(p.id, 3)}</div>
+  <div class="row" style="justify-content:space-between;align-items:flex-start">
+    <div><h1 class="title">${esc(p.name)}</h1><div class="latin">${esc(p.latin)} · ${PLACES[p.place]}</div></div>
+    <label class="btn small ghost" style="margin-top:14px;flex:none">📷 Змінити фото<input type="file" id="photo" accept="image/*" hidden></label>
+  </div>
+  <div class="box now"><h3>Що робити зараз (${SEASONS[s]})</h3>${esc(p.seasons[s])}</div>
+  ${p.note ? `<div class="box note">${esc(p.note)}</div>` : ""}
+
+  <h2>Задачі</h2>
+  ${ts.length ? ts.map(t => taskRow(t, false)).join("") : `<div class="empty">Задач поки немає</div>`}
+
+  <div class="box"><h3>Нова задача</h3>
+    ${sug ? `<div class="small">Швидко додати:</div><div class="sugg">${sug}</div>` : ""}
+    <label class="f">Що зробити</label><select id="ntype">${opts}</select>
+    <label class="f">Коментар (необов'язково)</label><input type="text" id="ntitle" placeholder="напр. полити теплою водою">
+    <label class="f">Дата</label><input type="date" id="ndate" value="${today()}">
+    <label class="f">Повторювати</label>
+    <select id="nevery"><option value="0">Один раз</option><option value="3">Кожні 3 дні</option><option value="5">Кожні 5 днів</option>
+      <option value="7">Щотижня</option><option value="10">Кожні 10 днів</option><option value="14">Кожні 2 тижні</option><option value="30">Щомісяця</option></select>
+    <button class="btn" id="nadd" style="margin-top:12px;width:100%">Додати задачу</button>
+  </div>
+
+  <h2>Догляд</h2>
+  <div class="box"><dl class="care" style="margin:0">
+    <dt>☀️ Світло</dt><dd>${esc(p.care.light)}</dd>
+    <dt>💧 Полив</dt><dd>${esc(p.care.water)}</dd>
+    <dt>💨 Вологість</dt><dd>${esc(p.care.humidity)}</dd>
+    <dt>🧪 Підживлення</dt><dd>${esc(p.care.feed)}</dd>
+    <dt>🪴 Ґрунт і пересадка</dt><dd>${esc(p.care.soil)}</dd>
+  </dl></div>
+
+  <h2>За сезонами</h2>
+  <div class="box"><div class="stabs">${Object.entries(SEASONS).map(([k, v]) =>
+    `<button class="chip ${tab === k ? "on" : ""}" data-stab="${k}">${v}</button>`).join("")}</div>${esc(p.seasons[tab])}</div>
+
+  ${hist.length ? `<h2>Що вже зроблено</h2><div class="box"><ul class="hist">${hist.map(h =>
+    `<li>${esc(h.date.split("-").reverse().join("."))} — ${esc(h.title)}</li>`).join("")}</ul></div>` : ""}
+  <p class="small" style="margin-top:16px">Тексти догляду підготовлено AI — перевір і скажи, що виправити.</p>`;
+}
+
+// ---------- actions ----------
+function markDone(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  S.history.push({ plant: t.plant, title: t.title, date: today() });
+  if (t.every) { t.due = addDays(today(), t.every); t.urgent = false; toast("Готово! Наступного разу: " + human(t.due)); }
+  else { S.tasks = S.tasks.filter(x => x.id !== id); toast("Готово 🌿"); }
+  save(); render();
+}
+function moreMenu(id) {
+  const t = S.tasks.find(x => x.id === id); if (!t) return;
+  const p = byId[t.plant];
+  const bg = document.createElement("div"); bg.className = "sheet-bg";
+  bg.innerHTML = `<div class="sheet"><h3>${esc(t.title)}</h3><div class="sub">${esc(p.name)} · ${human(t.due)}</div>
+    <button class="opt" data-a="1">Перенести на завтра</button>
+    <button class="opt" data-a="3">Перенести на 3 дні</button>
+    <button class="opt" data-a="7">Перенести на тиждень</button>
+    <button class="opt" data-a="cal">📅 Додати в календар iPhone (з нагадуванням)</button>
+    <button class="opt red" data-a="del">Видалити задачу</button>
+    <button class="opt" data-a="x">Скасувати</button></div>`;
+  document.body.appendChild(bg);
+  bg.onclick = e => {
+    const a = e.target.dataset.a; if (e.target === bg || a === "x") return bg.remove();
+    if (!a) return;
+    if (a === "cal") { calendar(t, p); return bg.remove(); }
+    if (a === "del") { if (confirm("Видалити задачу «" + t.title + "»?")) { S.tasks = S.tasks.filter(x => x.id !== id); toast("Видалено"); } }
+    else { t.due = addDays(t.due < today() ? today() : t.due, +a); toast("Перенесено: " + human(t.due)); }
+    save(); bg.remove(); render();
+  };
+}
+function calendar(t, p) {
+  const d = t.due.replace(/-/g, ""), d2 = addDays(t.due, 1).replace(/-/g, "");
+  const lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//kvity//UA", "BEGIN:VEVENT",
+    "UID:" + t.id + "@kvity", "DTSTAMP:" + new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z",
+    "DTSTART;VALUE=DATE:" + d, "DTEND;VALUE=DATE:" + d2,
+    "SUMMARY:" + (p.name + ": " + t.title).replace(/[,;]/g, " ")];
+  if (t.every) lines.push("RRULE:FREQ=DAILY;INTERVAL=" + t.every);
+  lines.push("BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + t.title.replace(/[,;]/g, " "), "TRIGGER:PT9H", "END:VALARM", "END:VEVENT", "END:VCALENDAR");
+  const blob = new Blob([lines.join("\r\n")], { type: "text/calendar" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "roslyna.ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("Відкриється Календар — натисни «Додати»");
+}
+function addTask(pid, type, title, due, every) {
+  S.tasks.push({ id: uid(), plant: pid, type, title: title || TYPES[type].replace(/^\S+\s/, ""), due, every: +every || 0, urgent: false });
+  save(); toast("Задачу додано: " + human(due)); render();
+}
+function setPhoto(pid, file) {
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 900 / Math.max(img.width, img.height));
+      const c = document.createElement("canvas"); c.width = img.width * k; c.height = img.height * k;
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      S.photos[pid] = c.toDataURL("image/jpeg", 0.75); save(); render(); toast("Фото оновлено");
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function bind() {
+  const app = document.getElementById("app");
+  app.querySelectorAll("[data-open]").forEach(el => el.onclick = () => { seasonTab = null; history.pushState({}, ""); go({ name: "plant", id: el.dataset.open, from: view.name === "plant" ? "plants" : view.name }); });
+  app.querySelectorAll("[data-done]").forEach(el => el.onclick = e => { e.stopPropagation(); markDone(el.dataset.done); });
+  app.querySelectorAll("[data-more]").forEach(el => el.onclick = e => { e.stopPropagation(); moreMenu(el.dataset.more); });
+  app.querySelectorAll("[data-filter]").forEach(el => el.onclick = () => { filter = el.dataset.filter; render(); });
+  app.querySelectorAll("[data-stab]").forEach(el => el.onclick = () => { seasonTab = el.dataset.stab; render(); });
+  const back = app.querySelector("[data-back]"); if (back) back.onclick = () => go({ name: view.from || "plants" });
+  if (view.name === "plant") {
+    const p = byId[view.id];
+    // on plant page, the photo/name in task rows shouldn't navigate again
+    app.querySelectorAll(".task [data-open]").forEach(el => el.onclick = null);
+    app.querySelectorAll("[data-sugg]").forEach(el => el.onclick = () => {
+      const s = p.suggest[+el.dataset.sugg]; addTask(p.id, s.type, s.title, today(), s.every);
+    });
+    document.getElementById("nadd").onclick = () => addTask(p.id, ntype.value, ntitle.value.trim(), ndate.value || today(), nevery.value);
+    document.getElementById("photo").onchange = e => e.target.files[0] && setPhoto(p.id, e.target.files[0]);
+  }
+  const exp = document.getElementById("exp");
+  if (exp) exp.onclick = () => {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S)], { type: "application/json" }));
+    a.download = "roslyny-kopiia-" + today() + ".json"; document.body.appendChild(a); a.click(); a.remove();
+  };
+  const imp = document.getElementById("imp");
+  if (imp) imp.onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(txt => {
+      const d = JSON.parse(txt);
+      if (!Array.isArray(d.tasks)) throw new Error();
+      if (confirm("Замінити поточні дані копією від файлу?")) { S = d; save(); render(); toast("Дані відновлено"); }
+    }).catch(() => toast("Це не схоже на файл копії"));
+  };
+}
+
+render();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+</script>
+</body>
+</html>
